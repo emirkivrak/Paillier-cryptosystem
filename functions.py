@@ -1,8 +1,5 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 def isprime(a):
-    """bir sayýnýn asal olup olmadýðýný kontrol eden fonksiyon"""
+   
     i=3
     if(a<2):
         return(0)
@@ -15,7 +12,7 @@ def isprime(a):
     return(1)
 
 def allprimes(n):
-    """bir sayýdan küçük bütün asal sayýlarý dizi olarak döndüren fonksiyon"""
+ 
     primes=[]
     for i in range(2,n+1):
         primes.append(i)
