@@ -2,3 +2,7 @@
 .test.py.swp
 
 .test.py.swo
+
+*.swp
+
+*.swo

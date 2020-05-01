@@ -1,9 +1,20 @@
-from random import getrandbits,randrange
+from random import getrandbits,randrange,randint
+from math import gcd ## gcd == ebob
 
 class PaillierKeyGenerator:
-    
+    def generate_paillier_key_pairs(self):
+        q = generate_random_primary_number()
+        p = generate_random_primary_number()
+
+        n = p * q 
+        
+        lambda_val = self.ekok(p-1, q-1)
+        
+        g = random.randint(n**2,n**3) ## n**2 den büyük rastgele bir g sayısı seçilecekti,  n**2 den n**3 e kadar olabilir.
+
+
     def generate_random_primary_number(self,numbers_of_test = 3,bits = 1024):
-        """Rastgele büyük bir sayı üretip primality teste sokacağız eğer başarılı ise
+         """Rastgele büyük bir sayı üretip primality teste sokacağız eğer başarılı ise
            generation_successfull değeri true değişken alacak ve fonksiyon geriye sayıyı döndürecek 
            bu fonksiyon iki büyük p ve q asal sayısını üretmek için yazılıyor"""
         generation_succesfull = False 
@@ -13,20 +24,19 @@ class PaillierKeyGenerator:
                 large_number = getrandbits(bits)
                 if(self.rabin_miller(large_number,numbers_of_test)==True):
                     generation_succesfull == True
-                    print("Test başarıyla tamamlandı rastgele sayı : ")
+                    print("Rabin Miller testi başarılı. ")
+                    return large_number
                 else:
                     continue
 
             except KeyboardInterrupt:
                 print("devam etmekte olan işlemi sonlandırdınız.")
-            ##except:
-              ##  print("bir hata meydana geldi.. test düzgün gerçekleşememiş olabilir.")
-            return large_number
-                    
-
+            except:
+                print("bir hata meydana geldi.. test düzgün gerçekleşememiş olabilir.")
+           
 
     def rabin_miller(self,n, k):
-
+"""Rabin Miller n-> sayı k -> test sayısı"""
         if n == 2:
             return True
 
@@ -49,5 +59,10 @@ class PaillierKeyGenerator:
             else:
                 return False
         return True
+    
+    def ekok(a,b): return a * b / gcd(a,b)
+
+        
+
 k=PaillierKeyGenerator()     
 print(k.generate_random_primary_number())
