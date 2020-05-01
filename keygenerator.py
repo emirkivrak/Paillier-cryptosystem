@@ -14,9 +14,9 @@ class PaillierKeyGenerator:
 
 
     def generate_random_primary_number(self,numbers_of_test = 3,bits = 1024):
-         """Rastgele büyük bir sayı üretip primality teste sokacağız eğer başarılı ise
-           generation_successfull değeri true değişken alacak ve fonksiyon geriye sayıyı döndürecek 
-           bu fonksiyon iki büyük p ve q asal sayısını üretmek için yazılıyor"""
+        """Rastgele büyük bir sayı üretip primality teste sokacağız eğer başarılı ise
+        generation_successfull değeri true değişken alacak ve fonksiyon geriye sayıyı döndürecek 
+        bu fonksiyon iki büyük p ve q asal sayısını üretmek için yazılıyor"""
         generation_succesfull = False 
         
         while(generation_succesfull == False):
@@ -36,7 +36,7 @@ class PaillierKeyGenerator:
            
 
     def rabin_miller(self,n, k):
-"""Rabin Miller n-> sayı k -> test sayısı"""
+        """Rabin Miller n-> sayı k -> test sayısı"""
         if n == 2:
             return True
 
