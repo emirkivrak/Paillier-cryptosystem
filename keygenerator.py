@@ -1,17 +1,24 @@
 from random import getrandbits,randrange,randint
 from math import gcd ## gcd == ebob
-
 class PaillierKeyGenerator:
     def generate_paillier_key_pairs(self):
-        q = generate_random_primary_number()
-        p = generate_random_primary_number()
+        q = self.generate_random_primary_number()
+        p = self.generate_random_primary_number()
+        print("p ve q değerleri oluşturuldu.")
 
-        n = p * q 
+        n = p * q
+        print("n değeri oluşturuldu.")
         
-        lambda_val = self.ekok(p-1, q-1)
+        lambda_val = self.ekok(p-1,q-1)
+        print("lambda değeri oluşturuldu.")
         
-        g = random.randint(n**2,n**3) ## n**2 den büyük rastgele bir g sayısı seçilecekti,  n**2 den n**3 e kadar olabilir.
-
+        g = randint(n**2,n**3) ## n**2 den büyük rastgele bir g sayısı seçiliyor. üst limit olarak n**3 ün yeterli olacağını düşündüm.
+        print("g değeri oluşturuldu.")
+        
+        """Vikipedia adım 4 deki L fonksiyonu ve işlem"""
+        L = lambda x : x-1 // n
+        mikro = (L(pow(g,lambda_val,n**2))**-1)  % n
+        print("mikro değeri oluşturuldu")
 
     def generate_random_primary_number(self,numbers_of_test = 3,bits = 1024):
         """Rastgele büyük bir sayı üretip primality teste sokacağız eğer başarılı ise
@@ -60,9 +67,9 @@ class PaillierKeyGenerator:
                 return False
         return True
     
-    def ekok(a,b): return a * b / gcd(a,b)
+    def ekok(self,a,b): return a * b // gcd(a,b) ## / yerine // kullanmam gerekti cunkü olusan float overflow error verdiriyor.
 
         
 
 k=PaillierKeyGenerator()     
-print(k.generate_random_primary_number())
+k.generate_paillier_key_pairs()
