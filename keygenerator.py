@@ -1,19 +1,32 @@
 from random import getrandbits,randrange,randint
 from math import gcd ## gcd == ebob
-
+from os import path,mkdir
 class PrivateKey:
 
     def __init__(self,lambda_val,micro):
         print("Gizli anahtar oluşturuluyor")
         self.l = lambda_val
         self.m = micro
-        print("Gizli anahtar oluşturuldu")
+        export_key_to_file() ## değerler constructor ile alınıyor ve direk fonksiyon çağırılıp key  dosyaları oluşturuluyor.
 
-    def printKey(self):
-        print("** PRIVATE KEY ** ")
-        print("lambda değeri : ",self.l)
-        print("mikro değeri  :",self.m)
-        print("** PRIVATE KEY **")
+    def export_key_to_file(self):
+        print("Gizli anahtar dışarı aktarma başlıyor.")
+
+        """privatekey.txt dosyasını oluşturup üzerine yazıyoruz.."""
+        try:
+            with open("keys/privatekey.txt","w") as f:
+                f.write(str(self.l))
+                f.write("**")
+                f.write(str(self.m))
+                print("dosya oluşturuldu && yazma işlemi yapıldı.")
+
+        except IOError:
+            print("Dosyaya yazarken bir hata oluştu! Anahtar düzgün işlenememiş olabilir!")
+
+        finally:
+            print("Gizli anahtar yazma işlemi bitti. ")
+
+
 
 class PublicKey:
 
@@ -21,15 +34,24 @@ class PublicKey:
         print("Açık anahtar oluşturuluyor")
         self.n = n
         self.g = g
-        print("Açık anahtar Oluşturuldu.")
-        
-        
-    def printKey(self):
-        print("** PUBLIC KEY ** ")
-        print("n değeri : ",self.n)
-        print("g değeri  :",self.g)
-        print("** PUBLIC KEY **")
+         
 
+    def export_key_to_file(self):
+        print("Açık anahtar dışa aktarma başlıyor.")
+
+        """publickey.txt dosyasını oluşturup üzerine yazıyoruz.."""
+        try:
+            with open("publickey.txt","w") as f:
+                f.write(str(self.n))
+                f.write("**")
+                f.write(str(self.g))
+                print("dosya oluşturuldu && yazma işlemi yapıldı.")
+
+        except IOError:
+            print("Dosyaya yazarken bir hata oluştu! Anahtar düzgün işlenememiş olabilir!")
+
+        finally:
+            print("Açık anahtar yazma işlemi bitti. ")
 
 class PaillierKeyGenerator:
     def generate_paillier_key_pairs(self):
@@ -102,7 +124,25 @@ class PaillierKeyGenerator:
     
     def ekok(self,a,b): return a * b // gcd(a,b) ## / yerine // kullanmam gerekti cunkü olusan float overflow error verdiriyor.
 
+    def build_and_check_file_integrity:
+        private_path = "keys/privatekey.txt"
+        public_path = "keys/publickey.txt"
+
+        """Önceden key oluşturulup oluşturulmadığına bakıyoruz""" 
+        try:
+            if(path.exists(private_path) or path.exists(public_path)):
+                print("halihazırda bir anahtar çifti saklama dosyası var içleri kontrol ediliyor...")
+                if(os.path.getsize(privatepath) != 0 || os.path.getsize(public_path) != 0):
+                    ## iki dosyanın içeriği de 0 dan farklı ise muhtemel dolu
+                    input("Yeni anahtar Çiftini üzerine yazmak için ENTER a basın işlemi sonlandırmak için CTRL+C")
+        except FileNotFoundError:
         
+            """ keys dizinini oluşturuyoruz"""
+            try:
+                os.mkdir('keys')
+                print("keys dizini oluşturuldu")
+            except FileExistsError:
+                print("keys dizini oluşturulmuş .. başka bir dosya hatası var.")
 
 k=PaillierKeyGenerator()     
 k.generate_paillier_key_pairs()
