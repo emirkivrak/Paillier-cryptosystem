@@ -17,5 +17,19 @@ def int_to_string(data):
     #UNICODE OLAN DEĞER DECODE EDİLEREK STRİNG HALİNE GELİYOR
     return binascii.unhexlify(hex(data)[2:].encode('ascii')).decode('utf-8')
 
+def miller_hazirlik(n):
+    #d*2^r= n-1
+    d=0
+    r=0
+    while((d*(2**r))!=n-1):
+        r+=1
+        d=(n-1)//(2**r)
+        print(r,d)
+    return [d,r]
+
+
+print(miller_hazirlik(13))
+
+
 
 
