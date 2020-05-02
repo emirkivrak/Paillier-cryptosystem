@@ -7,7 +7,7 @@ class PrivateKey:
         print("Gizli anahtar oluşturuluyor")
         self.l = lambda_val
         self.m = micro
-        export_key_to_file() ## değerler constructor ile alınıyor ve direk fonksiyon çağırılıp key  dosyaları oluşturuluyor.
+        self.export_key_to_file() ## değerler constructor ile alınıyor ve direk fonksiyon çağırılıp key  dosyaları oluşturuluyor.
 
     def export_key_to_file(self):
         print("Gizli anahtar dışarı aktarma başlıyor.")
@@ -34,7 +34,7 @@ class PublicKey:
         print("Açık anahtar oluşturuluyor")
         self.n = n
         self.g = g
-         
+        self.export_key_to_file() 
 
     def export_key_to_file(self):
         print("Açık anahtar dışa aktarma başlıyor.")
@@ -59,7 +59,7 @@ class PaillierKeyGenerator:
         q = self.generate_random_primary_number()
         p = self.generate_random_primary_number()
         print("p ve q değerleri oluşturuldu.")
-
+        
         n = p * q
         print("n değeri oluşturuldu.")
         
