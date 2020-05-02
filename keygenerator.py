@@ -124,7 +124,7 @@ class PaillierKeyGenerator:
     
     def ekok(self,a,b): return a * b // gcd(a,b) ## / yerine // kullanmam gerekti cunkü olusan float overflow error verdiriyor.
 
-    def build_and_check_file_integrity:
+    def build_and_check_file_integrity():
         private_path = "keys/privatekey.txt"
         public_path = "keys/publickey.txt"
 
