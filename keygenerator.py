@@ -1,6 +1,6 @@
 from random import getrandbits,randrange,randint
 from math import gcd ## gcd == ebob
-from os import path,mkdir
+from os import path,mkdir,getcwd,chdir
 class PrivateKey:
 
     def __init__(self,lambda_val,micro):
@@ -16,7 +16,7 @@ class PrivateKey:
         try:
             with open("keys/privatekey.txt","w") as f:
                 f.write(str(self.l))
-                f.write("**")
+                f.write("\n")
                 f.write(str(self.m))
                 print("dosya oluşturuldu && yazma işlemi yapıldı.")
 
@@ -30,10 +30,10 @@ class PrivateKey:
 
 class PublicKey:
 
-    def __init__(self,n,g):
+    def __init__(self,n_val,g_val):
         print("Açık anahtar oluşturuluyor")
-        self.n = n
-        self.g = g
+        self.n = n_val
+        self.g = g_val
         self.export_key_to_file() 
 
     def export_key_to_file(self):
@@ -41,9 +41,9 @@ class PublicKey:
 
         """publickey.txt dosyasını oluşturup üzerine yazıyoruz.."""
         try:
-            with open("publickey.txt","w") as f:
+            with open("keys/publickey.txt","w") as f:
                 f.write(str(self.n))
-                f.write("**")
+                f.write("\n")
                 f.write(str(self.g))
                 print("dosya oluşturuldu && yazma işlemi yapıldı.")
 
@@ -56,8 +56,16 @@ class PublicKey:
 class PaillierKeyGenerator:
     def generate_paillier_key_pairs(self):
         print("Anahtar çifti üretme işlemi başlıyor..")
-        q = self.generate_random_primary_number()
-        p = self.generate_random_primary_number()
+        anahtar_uzunlugu = input("""Kaç bit uzunlugunda bir anahtar üretmek istersiniz = default değer ='1024'
+                                      Default değer ile devam etmek için ENTER a basın..
+                                        Yoksa istediğiniz değeri girin. DEĞERİNİZ =>      """) 
+        if(anahtar_uzunlugu == ""):
+            print("default değer 1024 kabul edildi.")
+            anahtar_uzunlugu = 1024
+        else:
+            print("Kabul edilen değer : " + anahtar_uzunlugu)
+        q = self.generate_random_primary_number(bits = int(anahtar_uzunlugu))
+        p = self.generate_random_primary_number(bits = int(anahtar_uzunlugu))
         print("p ve q değerleri oluşturuldu.")
         
         n = p * q
@@ -70,9 +78,15 @@ class PaillierKeyGenerator:
         print("g değeri oluşturuldu.")
         
         """Vikipedia adım 4 deki L fonksiyonu ve işlem"""
-        L = lambda x : x-1 // n
-        mikro = (L(pow(g,lambda_val,n**2))**-1)  % n
+        ##L = lambda x : x-1 // n
+        ##mikro = (L(pow(g,lambda_val,n**2))**-1)  % n
+        mikro = 1; ## DİKKAT !! MİKRO DEĞERİ ÜSTTEKİ GİBİ HESAPLANAMADIGI İÇİN İŞLEME DEVAM EDEBİLMEK İÇİN 1 VERDİM ..
         print("mikro değeri oluşturuldu")
+        
+        public_key = PublicKey(n,g)
+        
+        private_key = PrivateKey(lambda_val,mikro)
+        
 
     def generate_random_primary_number(self,numbers_of_test = 3,bits = 1024):
         print("Rastgele '",bits,"' bit asal sayı üretme islemi yapılacak '",numbers_of_test,"' kere test edilecek")
@@ -124,25 +138,33 @@ class PaillierKeyGenerator:
     
     def ekok(self,a,b): return a * b // gcd(a,b) ## / yerine // kullanmam gerekti cunkü olusan float overflow error verdiriyor.
 
-    def build_and_check_file_integrity():
-        private_path = "keys/privatekey.txt"
-        public_path = "keys/publickey.txt"
+    def build_and_check_file_integrity(self):
+        print("dosya yapısı kontrolü başlıyor ..")
+        current_dir = getcwd() ## şu anki dizini aldık
+        chdir(current_dir)
+        private_key_path = "keys/privatekey.txt"
+        public_key_path = "keys/publickey.txt"
 
         """Önceden key oluşturulup oluşturulmadığına bakıyoruz""" 
         try:
-            if(path.exists(private_path) or path.exists(public_path)):
+            if(path.exists("public_key_path") or path.exists(private_key_path)):
                 print("halihazırda bir anahtar çifti saklama dosyası var içleri kontrol ediliyor...")
-                if(os.path.getsize(privatepath) != 0 || os.path.getsize(public_path) != 0):
+                if(path.getsize(private_key_path) != 0 and path.getsize(public_key_path) != 0):
                     ## iki dosyanın içeriği de 0 dan farklı ise muhtemel dolu
                     input("Yeni anahtar Çiftini üzerine yazmak için ENTER a basın işlemi sonlandırmak için CTRL+C")
-        except FileNotFoundError:
+            else:
+                print("Keys dizini veya privatekey.txt ve publickey.txt Dosyaları Oluşturulmamış!")
+                print("Dosyalar otomatik oluşturulacak")
         
             """ keys dizinini oluşturuyoruz"""
             try:
-                os.mkdir('keys')
+                mkdir('keys')
                 print("keys dizini oluşturuldu")
             except FileExistsError:
-                print("keys dizini oluşturulmuş .. başka bir dosya hatası var.")
+                print("keys dizini oluşturulmuş .. Anahtar üretimine geçiliyor..")
+        except:
+            print("DOSYA BÜTÜNLÜĞÜ DOĞRULANAMADI, KEY YANLIŞ YERE YAZILIP OKUNABİLİR")
 
 k=PaillierKeyGenerator()     
+k.build_and_check_file_integrity()
 k.generate_paillier_key_pairs()
