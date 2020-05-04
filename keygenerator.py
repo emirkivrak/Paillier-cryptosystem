@@ -54,18 +54,9 @@ class PublicKey:
             print("Açık anahtar yazma işlemi bitti. ")
 
 class PaillierKeyGenerator:
-    def generate_paillier_key_pairs(self):
-        print("Anahtar çifti üretme işlemi başlıyor..")
-        anahtar_uzunlugu = input("""Kaç bit uzunlugunda bir anahtar üretmek istersiniz = default değer ='1024'
-                                      Default değer ile devam etmek için ENTER a basın..
-                                        Yoksa istediğiniz değeri girin. DEĞERİNİZ =>      """) 
-        if(anahtar_uzunlugu == ""):
-            print("default değer 1024 kabul edildi.")
-            anahtar_uzunlugu = 1024
-        else:
-            print("Kabul edilen değer : " + anahtar_uzunlugu)
-        q = self.generate_random_primary_number(bits = int(anahtar_uzunlugu))
-        p = self.generate_random_primary_number(bits = int(anahtar_uzunlugu))
+    def generate_paillier_key_pairs(self,anahtar_uzunlugu):
+        q = self.generate_random_primary_number(bits = anahtar_uzunlugu)
+        p = self.generate_random_primary_number(bits = anahtar_uzunlugu)
         print("p ve q değerleri oluşturuldu.")
         
         n = p * q
@@ -167,4 +158,4 @@ class PaillierKeyGenerator:
 
 k=PaillierKeyGenerator()     
 k.build_and_check_file_integrity()
-k.generate_paillier_key_pairs()
+k.generate_paillier_key_pairs(1024)
