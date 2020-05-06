@@ -49,5 +49,6 @@ class PaillierKeyGenerator:
             else:
                 return False
         return True
+
 k=PaillierKeyGenerator()     
 print(k.generate_random_primary_number())

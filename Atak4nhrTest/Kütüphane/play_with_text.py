@@ -1,6 +1,8 @@
 import binascii
 from random import getrandbits, randrange
+from os import path,mkdir,getcwd,chdir
 import math
+import pickle
 
 
 depolayici={'p':0,
@@ -53,32 +55,41 @@ def modpow(base, exponent, modulus):
 ##METNİ İNT DEĞERE ÇEVİRME VE O İNT DEĞERİ TEKRAR METNE ÇEVİRME KISMI
 
 def string_to_int(data):
-    # Yapılan İşlemler
-    # UTF-8 ENCODE İLE UNICODE HALE GETİRİLİYOR.     "ATAKANÇÇTESTÜÜĞĞ" ====>   b'ATAKAN\xc3\x87\xc3\x87TEST\xc3\x9c\xc3\x9c\xc4\x9e\xc4\x9e'
-    # 16 LIK HALE ÇEVİRDİK                           ====>b'4154414b414ec387c38754455354c39cc39cc49ec49e'
-    # 16 LIK HALDEN INT E ÇEVİRDİK                   ====>24442526145367114357973530860057415323702860751750302
+    """
+    Yapılan İşlemler
+    UTF-8 ENCODE İLE UNICODE HALE GETİRİLİYOR.     "ATAKANÇÇTESTÜÜĞĞ" ====>   b'ATAKAN\xc3\x87\xc3\x87TEST\xc3\x9c\xc3\x9c\xc4\x9e\xc4\x9e'
+    16 LIK HALE ÇEVİRDİK                           ====>b'4154414b414ec387c38754455354c39cc39cc49ec49e'
+    16 LIK HALDEN INT E ÇEVİRDİK                   ====>24442526145367114357973530860057415323702860751750302
+     """
+
     return int(binascii.hexlify(data.encode('utf-8')), 16)
 
 
 def int_to_string(data):
-    # Yapılan İşlemler
-    # ALINAN INT DEĞER 16 LIK DEĞERE DÖNÜŞTÜRÜLÜYOR
-    # DÖNÜŞTÜRÜLEN 16 LIK DEĞERİN BAŞINDAKİ 0x İFADESİ KESİLİYOR
-    # Unhexlify ile 16 lık değer unicode hale çevriliyor.
-    # UNICODE OLAN DEĞER DECODE EDİLEREK STRİNG HALİNE GELİYOR
+    """
+    Yapılan İşlemler
+    ALINAN INT DEĞER 16 LIK DEĞERE DÖNÜŞTÜRÜLÜYOR
+    DÖNÜŞTÜRÜLEN 16 LIK DEĞERİN BAŞINDAKİ 0x İFADESİ KESİLİYOR
+    Unhexlify ile 16 lık değer unicode hale çevriliyor.
+    UNICODE OLAN DEĞER DECODE EDİLEREK STRİNG HALİNE GELİYOR
+    """
     return binascii.unhexlify(hex(data)[2:].encode('ascii')).decode('utf-8')
 
 
 def anahtar_cifti_olustur(bits):
-    "P VE Q ASAL SAYILARI BULMAK İSTEDİĞİMİZ KEYİN BİT SAYISININ YARISI KADARDIR. P = 512BIT Q = 512BIT  N=1024 BIT"
-    "P VE Q ASAL SAYILARI EŞİT UZUNLUKTA SEÇİLMİŞLERDİR."
+    """
+    P VE Q ASAL SAYILARI BULMAK İSTEDİĞİMİZ KEYİN BİT SAYISININ YARISI KADARDIR. P = 512BIT Q = 512BIT  N=1024 BIT
+    P VE Q ASAL SAYILARI EŞİT UZUNLUKTA SEÇİLMİŞLERDİR.
+    """
+
     print("P DEĞİŞKENİ OLUŞTURULUYOR...")
     depolayici['p'] = asal_sayi_olustur(int(bits/2))
     print("P=",depolayici['p'])
     print("Q DEĞİŞKENİ OLUŞTURULUYOR...")
     depolayici['q'] = asal_sayi_olustur(int(bits/2))
-    print("Q=", depolayici['p'])
+    print("Q=", depolayici['q'])
     print("PUBLİC KEY OLUŞTURULUYOR...")
+    depolayici['n'] = depolayici['p'] * depolayici['q']
     public_key()
     private_key()
 
@@ -125,7 +136,6 @@ def public_key():
     "n=p*q"
     "lambda=()"
     if(depolayici['q']!=0,depolayici['p']!=0):
-        depolayici['n']= depolayici['p']*depolayici['q']
         depolayici['g']=depolayici['n']+1
         depolayici['nkare']=depolayici['n']*depolayici['n']
     print('PUBLIC KEY : ',depolayici['n'],depolayici['g'])
@@ -135,7 +145,7 @@ def private_key():
     depolayici['nü']=invmod(depolayici['lambda'],depolayici['n'])
     print('PRIVATE KEY : ',depolayici['lambda'],depolayici['nü'])
 
-def encrypt(plain):
+def encrypt_helper(plain):
     while True:
         r = asal_sayi_olustur((round(math.log(depolayici['n'], 2))))
         if r > 0 and r < depolayici['n']:
@@ -144,16 +154,73 @@ def encrypt(plain):
     cipher = (pow(depolayici['g'], plain, depolayici['nkare']) * x) % (depolayici['nkare'])
     return cipher
 
-def decrypt(cipher):
+def decrypt_helper(cipher):
     x = pow(cipher, depolayici['lambda'], depolayici['nkare']) - 1
     plain = ((x//depolayici['n'])*depolayici['nü']) %depolayici['n']
     return plain
 
+def keygen(bit_sayisi):
+    anahtar_cifti_olustur(bit_sayisi)
+    with open("publickey.txt", "wb+") as f:
+        pickle.dump(depolayici['n'],f)
+        pickle.dump(depolayici['g'],f)
+        f.close()
+    with open("privatekey.txt", "wb+") as f:
+        pickle.dump(depolayici['n'],f)
+        pickle.dump(depolayici['lambda'],f)
+        pickle.dump(depolayici['nü'], f)
+        f.close()
+
+def encrypt(plaintext,publickey):
+    temp_file=0
+    with open(publickey, "rb") as f:
+        depolayici['n']=pickle.load(f)
+        depolayici['g']=pickle.load(f)
+        depolayici['nkare']=depolayici['n']**2
+        f.close()
+    with open(plaintext,"r") as f:
+        temp_file=string_to_int(f.read())
+        print("!!!INFO==>Okunan değer =>",temp_file)
+        temp_file=encrypt_helper(temp_file)
+        f.close()
+    with open("ciphertext", "w+") as f:
+        f.write(str(temp_file))
+        f.close()
+
+def decyript(ciphertext,privatekey):
+    temp_file=0
+    with open(privatekey, "rb") as f:
+        depolayici['n']=pickle.load(f)
+        depolayici['lambda']=pickle.load(f)
+        depolayici['nü'] = pickle.load(f)
+        depolayici['nkare']=depolayici['n']**2
+        f.close()
+    with open(ciphertext,"r") as f:
+        temp_file=int(f.read())
+        print("!!!INFO==>Okunan değer =>",temp_file)
+        temp_file=decrypt_helper(temp_file)
+        f.close()
+    with open("plaintext2", "w+") as f:
+        f.write(int_to_string(temp_file))
+        f.close()
+    kontrol()
 
 
-anahtar_cifti_olustur(1024)
-print(depolayici)
-chipher = encrypt(string_to_int('TEST YAPIYORUM BROO'))
-print('SIFRELI TEXT',chipher)
-print('ÇÖZÜLMÜŞ TEXT ==>',int_to_string(decrypt(chipher)))
+
+def kontrol():
+    temp1=open("plaintext","r").read()
+    temp2=open("plaintext2","r").read()
+    if(temp1 == temp2):
+        print("!!!SUCCESS==>Plaintext ve plaintext2 dosyaları özdeştir.")
+
+
+
+
+
+
+
+
+keygen(512)
+encrypt("plaintext","publickey.txt")
+decyript("ciphertext","privatekey.txt")
 
