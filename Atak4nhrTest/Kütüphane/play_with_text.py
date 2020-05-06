@@ -147,7 +147,7 @@ def private_key():
 
 def encrypt_helper(plain):
     while True:
-        r = asal_sayi_olustur((round(math.log(depolayici['n'], 2))))
+        r = asal_sayi_olustur((round(math.log(depolayici['n'], 2)/2)))
         if r > 0 and r < depolayici['n']:
             break
     x = pow(r, depolayici['n'], depolayici['nkare'])
@@ -220,7 +220,8 @@ def kontrol():
 
 
 
-keygen(512)
+keygen(1024)
 encrypt("plaintext","publickey.txt")
 decyript("ciphertext","privatekey.txt")
 
+#BÜYÜK Ş DE SIKINTI VAR HOCA FISTIKÇI ŞAHAP YAZMASIN
