@@ -1,10 +1,10 @@
-import binascii
 from random import getrandbits, randrange
-from os import path,mkdir,getcwd,chdir
+import binascii
 import math
-import pickle
 
-
+"""
+VERİLERİ BURADA DEPOLAYACAĞIZ.
+"""
 depolayici={'p':0,
             'q':0,
             'n':0,
@@ -15,9 +15,33 @@ depolayici={'p':0,
             'nkare':0
             }
 
-# -*- coding: UTF-8 -*-
+def isprime(a):
+   
+    i=3
+    if(a<2):
+        return(0)
+    if a!=2 and a%2==0:
+        return(0)
+    while i<=a**(1/2):
+        if a%i==0:
+            return(0)
+        i += 2
+    return(1)
+
+def allprimes(n):
+ 
+    primes=[]
+    for i in range(2,n+1):
+        primes.append(i)
+    for x in range(0,int(n/2)+1):
+        if(primes[x]!=0):
+            for i in range(x+primes[x],n-1,primes[x]):
+                primes[i]=0
+    primes.sort()
+    return(primes[primes.count(0):])
 
 "BÜYÜK SAYILARDA İŞLEMLER PATLADIĞI İÇİN KULLANILAN FONKSİYONLAR"
+
 def invmod(a, p, maxiter=1000000):
     """The multiplicitive inverse of a in the integers modulo p:
          a * b == 1 mod p
@@ -35,7 +59,7 @@ def invmod(a, p, maxiter=1000000):
     else:
         raise ValueError('%d has no inverse mod %d' % (a, p))
     return d
-
+    
 def modpow(base, exponent, modulus):
     """Modular exponent:
          c = b ^ e mod m
@@ -48,12 +72,9 @@ def modpow(base, exponent, modulus):
         exponent = exponent >> 1
         base = (base * base) % modulus
     return result
-
-
-
-
+    
 ##METNİ İNT DEĞERE ÇEVİRME VE O İNT DEĞERİ TEKRAR METNE ÇEVİRME KISMI
-
+    
 def string_to_int(data):
     """
     Yapılan İşlemler
@@ -74,7 +95,7 @@ def int_to_string(data):
     UNICODE OLAN DEĞER DECODE EDİLEREK STRİNG HALİNE GELİYOR
     """
     return binascii.unhexlify(hex(data)[2:].encode('ascii')).decode('utf-8')
-
+    
 
 def anahtar_cifti_olustur(bits):
     """
@@ -94,7 +115,7 @@ def anahtar_cifti_olustur(bits):
     private_key()
 
 
-def asal_sayi_olustur(bits=512,numbers_of_test=3):
+def asal_sayi_olustur(bits=512,numbers_of_test=12):  #NUMBER OF TEST SAYISI ARTTIKÇA DOĞRULUK ORANI ARTIYOR FAKAT PERFORMANSTAN KAYIP OLUYOR.
     """Rastgele büyük bir sayı üretip primality teste sokacağız eğer başarılı ise
        generation_successfull değeri true değişken alacak ve fonksiyon geriye sayıyı döndürecek
        bu fonksiyon iki büyük p ve q asal sayısını üretmek için yazılıyor"""
@@ -133,8 +154,6 @@ def rabin_miller(n, k):
 
 def public_key():
     "P VE Q EŞİT UZUNLUKTADIR"
-    "n=p*q"
-    "lambda=()"
     if(depolayici['q']!=0,depolayici['p']!=0):
         depolayici['g']=depolayici['n']+1
         depolayici['nkare']=depolayici['n']*depolayici['n']
@@ -145,7 +164,7 @@ def private_key():
     depolayici['nü']=invmod(depolayici['lambda'],depolayici['n'])
     print('PRIVATE KEY : ',depolayici['lambda'],depolayici['nü'])
 
-def encrypt_helper(plain):
+def encrypt_helper(plain): #https://en.wikipedia.org/wiki/Paillier_cryptosystem section 3
     while True:
         r = asal_sayi_olustur((round(math.log(depolayici['n'], 2)/2)))
         if r > 0 and r < depolayici['n']:
@@ -154,74 +173,17 @@ def encrypt_helper(plain):
     cipher = (pow(depolayici['g'], plain, depolayici['nkare']) * x) % (depolayici['nkare'])
     return cipher
 
-def decrypt_helper(cipher):
+def decrypt_helper(cipher): #https://en.wikipedia.org/wiki/Paillier_cryptosystem section 4
     x = pow(cipher, depolayici['lambda'], depolayici['nkare']) - 1
     plain = ((x//depolayici['n'])*depolayici['nü']) %depolayici['n']
     return plain
 
-def keygen(bit_sayisi):
-    anahtar_cifti_olustur(bit_sayisi)
-    with open("publickey.txt", "wb+") as f:
-        pickle.dump(depolayici['n'],f)
-        pickle.dump(depolayici['g'],f)
-        f.close()
-    with open("privatekey.txt", "wb+") as f:
-        pickle.dump(depolayici['n'],f)
-        pickle.dump(depolayici['lambda'],f)
-        pickle.dump(depolayici['nü'], f)
-        f.close()
-
-def encrypt(plaintext,publickey):
-    temp_file=0
-    with open(publickey, "rb") as f:
-        depolayici['n']=pickle.load(f)
-        depolayici['g']=pickle.load(f)
-        depolayici['nkare']=depolayici['n']**2
-        f.close()
-    with open(plaintext,"r") as f:
-        temp_file=string_to_int(f.read())
-        print("!!!INFO==>Okunan değer =>",temp_file)
-        temp_file=encrypt_helper(temp_file)
-        f.close()
-    with open("ciphertext", "w+") as f:
-        f.write(str(temp_file))
-        f.close()
-
-def decyript(ciphertext,privatekey):
-    temp_file=0
-    with open(privatekey, "rb") as f:
-        depolayici['n']=pickle.load(f)
-        depolayici['lambda']=pickle.load(f)
-        depolayici['nü'] = pickle.load(f)
-        depolayici['nkare']=depolayici['n']**2
-        f.close()
-    with open(ciphertext,"r") as f:
-        temp_file=int(f.read())
-        print("!!!INFO==>Okunan değer =>",temp_file)
-        temp_file=decrypt_helper(temp_file)
-        f.close()
-    with open("plaintext2", "w+") as f:
-        f.write(int_to_string(temp_file))
-        f.close()
-    kontrol()
-
-
-
-def kontrol():
+    
+def kontrol(): #DOSYALARIN ÖZDEŞLİĞİ KONTROL EDİLİYOR.
     temp1=open("plaintext","r").read()
     temp2=open("plaintext2","r").read()
     if(temp1 == temp2):
         print("!!!SUCCESS==>Plaintext ve plaintext2 dosyaları özdeştir.")
-
-
-
-
-
-
-
-
-keygen(1024)
-encrypt("plaintext","publickey.txt")
-decyript("ciphertext","privatekey.txt")
-
-#BÜYÜK Ş DE SIKINTI VAR HOCA FISTIKÇI ŞAHAP YAZMASIN
+    
+    
+    
