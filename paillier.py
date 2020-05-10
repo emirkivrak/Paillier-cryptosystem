@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+#170401009 - ATAKAN TÜRKAY
 from Kütüphane import functions as kutuphane
 from os import path,mkdir,getcwd,chdir
 import pickle     #Değişkenleri dosya içerisine dump ederek kaydediyoruz.
@@ -17,6 +18,12 @@ def keygen(bit_sayisi):
         f.close()
 
 def encrypt(plaintext,publickey):
+    try:
+        f = open("publickey.txt")
+        d = open("privatekey.txt")
+    except IOError:
+        print("Privatekey veya publickey bulunamadı lütfen keygen fonksiyonunu çalıştırın.")
+        return
     temp_file=0                                         #plaintext içerisindeki verinin int haline dönüştürülmüş versiyonunu tutacak.
     with open(publickey, "rb") as f:                    #verileri dictionary içine kaydediyoruz.
         kutuphane.depolayici['n']=pickle.load(f)        #verileri dictionary içine kaydediyoruz.
@@ -35,6 +42,13 @@ def encrypt(plaintext,publickey):
 
 def decyript(ciphertext,privatekey):
     temp_file=0
+    try:
+        f = open("publickey.txt")
+        d = open("privatekey.txt")
+    except IOError:
+        print("Privatekey veya publickey bulunamadı lütfen keygen fonksiyonunu çalıştırın.")
+        return
+        
     with open(privatekey, "rb") as f:
         kutuphane.depolayici['n']=pickle.load(f)        #verileri dictionary içine kaydediyoruz.
         kutuphane.depolayici['lambda']=pickle.load(f)   #verileri dictionary içine kaydediyoruz.
