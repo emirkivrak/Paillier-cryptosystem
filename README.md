@@ -14,9 +14,9 @@ Necdet Yucel (nyucel) hocamızın verdiği Kriptografi dersinin vize ödevi olan
 
 ## Hazırlayanlar <a name = "getting_started"></a>
 
-170401009 - ATAKAN TÜRKAY
+ATAKAN TÜRKAY
 
-170401028 - EMİR ALİ KIVRAK
+EMİR ALİ KIVRAK
 
 
 ## Dosya dizin yapısı ve çalıştırma<a name = "structure"></a>
