@@ -7,11 +7,6 @@
 - [Dosya dizin yapısı ve çalıştırma](#structure)
 
 
-
-## Ödev hakkında <a name = "about"></a>
-
-Necdet Yucel (nyucel) hocamızın verdiği Kriptografi dersinin vize ödevi olan Paillier Cryptosystem'in  python3 ile uygulanışıdır
-
 ## Hazırlayanlar <a name = "getting_started"></a>
 
 ATAKAN TÜRKAY
